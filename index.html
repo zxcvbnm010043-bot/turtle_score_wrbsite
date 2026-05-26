@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>龜步前進大作戰</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 30px;
+      font-family: "Microsoft JhengHei", sans-serif;
+      background:
+        radial-gradient(circle at 15% 20%, #fff3b0 0, transparent 24%),
+        radial-gradient(circle at 85% 15%, #b9fbc0 0, transparent 22%),
+        radial-gradient(circle at 20% 85%, #a0c4ff 0, transparent 25%),
+        linear-gradient(135deg, #fefae0, #e9f5db);
+      min-height: 100vh;
+      text-align: center;
+      color: #264653;
+    }
+
+    .title-card {
+      max-width: 950px;
+      margin: 0 auto 28px;
+      padding: 22px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 28px;
+      border: 4px dashed #ffb703;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 40px;
+    }
+
+    .subtitle {
+      margin: 6px 0;
+      font-size: 18px;
+      color: #555;
+    }
+
+    .stadium {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px;
+      background: #f4a261;
+      border-radius: 40px;
+      border: 8px solid #bc6c25;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+      position: relative;
+    }
+
+    .track-area {
+      background: #e76f51;
+      border-radius: 30px;
+      padding: 22px;
+      border: 5px solid #ffffff;
+      position: relative;
+    }
+
+    .lane {
+      height: 90px;
+      display: flex;
+      align-items: center;
+      border-bottom: 4px solid rgba(255,255,255,0.85);
+      position: relative;
+    }
+
+    .lane:last-child {
+      border-bottom: none;
+    }
+
+    .lane-label {
+      width: 125px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 18px;
+      padding: 10px;
+      font-weight: bold;
+      color: #264653;
+      margin-right: 22px;
+      border: 3px solid #ffd166;
+      z-index: 6;
+    }
+
+    .running-lane {
+      flex: 1;
+      height: 100%;
+      position: relative;
+    }
+
+    .start-line {
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 6px;
+      background: repeating-linear-gradient(
+        to bottom,
+        #ffffff 0,
+        #ffffff 12px,
+        #222 12px,
+        #222 24px
+      );
+      z-index: 5;
+      border-radius: 4px;
+    }
+
+    .finish-line {
+      position: absolute;
+      right: 145px;
+      top: 8px;
+      bottom: 8px;
+      width: 6px;
+      background: repeating-linear-gradient(
+        to bottom,
+        #ffffff 0,
+        #ffffff 12px,
+        #222 12px,
+        #222 24px
+      );
+      z-index: 5;
+      border-radius: 4px;
+    }
+
+    .turtle {
+      position: absolute;
+      left: calc(var(--progress) * (100% - 175px));
+      top: 50%;
+      transform: translateY(-50%) scaleX(-1);
+      font-size: 44px;
+      transition: left 0.7s ease;
+      z-index: 4;
+      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.25));
+    }
+
+    .score-badge {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #fff3b0;
+      border: 3px solid #ffb703;
+      border-radius: 18px;
+      padding: 8px 14px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #bc6c25;
+      z-index: 6;
+      min-width: 78px;
+    }
+
+    .control-panel {
+      max-width: 1100px;
+      margin: 26px auto 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 16px;
+    }
+
+    .team-control {
+      background: rgba(255,255,255,0.92);
+      border-radius: 22px;
+      padding: 16px;
+      border: 3px solid #caf0f8;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+    }
+
+    .team-control h3 {
+      margin: 0 0 10px;
+      color: #264653;
+    }
+
+    .team-control p {
+      margin: 8px 0;
+      font-weight: bold;
+      color: #bc6c25;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 9px 14px;
+      margin: 4px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.16);
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-family: "Microsoft JhengHei", sans-serif;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+
+    .add {
+      background: linear-gradient(135deg, #52b788, #2d6a4f);
+    }
+
+    .minus {
+      background: linear-gradient(135deg, #ffb703, #fb8500);
+    }
+
+    .dash {
+      background: linear-gradient(135deg, #4cc9f0, #4361ee);
+    }
+
+    .reset-one {
+      background: linear-gradient(135deg, #90a4ae, #607d8b);
+    }
+
+    .main-buttons {
+      margin: 26px auto 0;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .reset-all {
+      background: linear-gradient(135deg, #ef476f, #d00000);
+    }
+
+    .hint {
+      max-width: 900px;
+      margin: 20px auto 0;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.88);
+      color: #386641;
+      line-height: 1.7;
+      border: 2px solid #b7e4c7;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="title-card">
+    <h1>🐢 烏龜跑道計分圖 🏁</h1>
+    <p class="subtitle">每一組都有自己的跑道，答對或完成任務就讓烏龜往前跑！</p>
+    <p class="subtitle">第一道是第一組，第二道是第二組，以此類推。</p>
+  </div>
+
+  <div class="stadium">
+    <div class="track-area" id="trackArea"></div>
+  </div>
+
+  <div class="control-panel" id="controlPanel"></div>
+
+  <div class="main-buttons">
+    <button class="reset-all" onclick="resetAll()">🔄 全部回到起跑線</button>
+  </div>
+
+  <div class="hint">
+    使用方式：五組起始皆為 0 分，烏龜會停在起跑線上。每組答對一題或完成任務時，可以按「加 1 分」讓烏龜往終點前進。
+    若想讓某一組直接完成任務，可按「衝向終點」。
+  </div>
+
+  <script>
+    const maxScore = 10;
+
+    let teams = [
+      { name: "第一組", score: 0 },
+      { name: "第二組", score: 0 },
+      { name: "第三組", score: 0 },
+      { name: "第四組", score: 0 },
+      { name: "第五組", score: 0 }
+    ];
+
+    function renderTrack() {
+      const trackArea = document.getElementById("trackArea");
+      const controlPanel = document.getElementById("controlPanel");
+
+      trackArea.innerHTML = "";
+      controlPanel.innerHTML = "";
+
+      teams.forEach((team, index) => {
+        const progressPercent = team.score / maxScore;
+
+        const lane = document.createElement("div");
+        lane.className = "lane";
+
+        lane.innerHTML = `
+          <div class="lane-label">第 ${index + 1} 道<br>${team.name}</div>
+
+          <div class="running-lane">
+            <div class="start-line"></div>
+            <div class="finish-line"></div>
+            <div class="turtle" style="--progress: ${progressPercent};">🐢</div>
+            <div class="score-badge">${team.score} 分</div>
+          </div>
+        `;
+
+        trackArea.appendChild(lane);
+
+        const control = document.createElement("div");
+        control.className = "team-control";
+
+        control.innerHTML = `
+          <h3>${team.name}</h3>
+          <p>${team.score} 分</p>
+          <button class="add" onclick="addScore(${index})">＋ 加 1 分</button>
+          <button class="minus" onclick="minusScore(${index})">－ 扣 1 分</button>
+          <button class="dash" onclick="dashToFinish(${index})"> 衝向終點</button>
+          <button class="reset-one" onclick="resetOne(${index})">回起跑線</button>
+        `;
+
+        controlPanel.appendChild(control);
+      });
+    }
+
+    function addScore(index) {
+      if (teams[index].score < maxScore) {
+        teams[index].score++;
+      }
+      renderTrack();
+    }
+
+    function minusScore(index) {
+      if (teams[index].score > 0) {
+        teams[index].score--;
+      }
+      renderTrack();
+    }
+
+    function dashToFinish(index) {
+      teams[index].score = maxScore;
+      renderTrack();
+    }
+
+    function resetOne(index) {
+      teams[index].score = 0;
+      renderTrack();
+    }
+
+    function resetAll() {
+      teams.forEach(team => team.score = 0);
+      renderTrack();
+    }
+
+    renderTrack();
+  </script>
+
+</body>
+</html>
